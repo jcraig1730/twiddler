@@ -9,6 +9,7 @@
         -webkit-box-sizing: border-box;
         -moz-box-sizing: border-box;
         box-sizing: border-box;
+        font-family: arial;
       }
       *,
       *:before,
@@ -36,6 +37,7 @@
         });
 
         // tweet stream/home
+
         var loadTweets = function(req) {
           var source = req === 'home' ? streams.home : streams.users[req];
           var $tweetFeedContainer = $('<div class="tweetFeedContainer"></div>');
@@ -60,9 +62,14 @@
             $('.tweet:odd').css({ background: '#acdce1' });
 
             // username
+
             var $username = $('<a "href=#"></a>');
             $username.text(tweet.user);
-            $username.css({ color: '#fff' });
+            $username.css({
+              color: '#fff',
+              fontSize: '1.5em',
+              borderBottom: '1px solid #fff'
+            });
             $username.on('click', function() {
               $('.tweetFeedContainer').remove();
               page = 'user page';
@@ -71,12 +78,14 @@
             $username.appendTo($tweet);
 
             // message
+
             var $message = $('<p></p>');
             $message.text(tweet.message);
             $message.css({ margin: 0, padding: '15px 0' });
             $message.appendTo($tweet);
 
             // timestamp
+
             var $timestamp = $('<div></div>');
             $timestamp.text(timeFrom(tweet.created_at));
             $timestamp.css({
@@ -93,6 +102,7 @@
         };
 
         // tweetfeed refresh button/home button
+
         function loadUpdateButton() {
           var $buttonContainer = $('<div></div>');
           $buttonContainer.css({
@@ -130,18 +140,55 @@
         }
 
         // info sidebar
+
         var $sidebarContainer = $('<div></div>');
         $sidebarContainer.css({
           display: 'flex',
           width: '30%',
-          background: 'rgba(255, 255, 255, .5'
+          background: 'rgba(255, 255, 255, .5',
+          '-webkit-box-shadow': '14px 15px 23px -1px rgba(0,0,0,0.49)',
+          boxShadow: '14px 15px 23px -1px rgba(0,0,0,0.49)',
+          borderRadius: '20px'
         });
 
+        // random tweet
+
         var randomTweet = randomElement(streams.home);
+        var $randomTweetContainer = $('<div></div>');
+        $randomTweetContainer.css({
+          height: 'fit-content',
+          background: 'rgb(162, 208, 251)',
+          border: '1px solid #fff',
+          borderRadius: '20px',
+          width: '75%',
+          padding: '15px 20px',
+          '-webkit-box-shadow': '14px 15px 23px -1px rgba(0,0,0,0.49)', // look up later if this is the correct way to do this line*****
+          boxShadow: '14px 15px 23px -1px rgba(0,0,0,0.49)'
+        });
+        var $randomTweetHeadline = $('<h3>RandomTweet</h3>');
+        $randomTweetHeadline.css({
+          color: '#fff',
+          fontSize: '2em',
+          marginBottom: 0,
+          borderBottom: '2px solid #fff',
+          textAlign: 'center'
+        });
+        $randomTweetHeadline.appendTo($randomTweetContainer);
+
         var $randomTweet = $('<div></div>');
+        $randomTweet.css({
+          height: 'fit-content',
+          padding: '10px 10px 0 10px'
+        });
 
         var $randomTweetUser = $('<p></p>');
         $randomTweetUser.text(randomTweet.user);
+        $randomTweetUser.css({
+          color: '#fff',
+          fontSize: '1.6em',
+          margin: 0,
+          borderBottom: '1px solid #fff'
+        });
         $randomTweetUser.appendTo($randomTweet);
 
         var $randomTweetText = $('<p></p>');
@@ -150,15 +197,18 @@
 
         var $randomTweetTimestamp = $('<p></p>');
         $randomTweetTimestamp.text(timeFrom(randomTweet.created_at));
+        $randomTweetTimestamp.css({ fontSize: '.8em' });
         $randomTweetTimestamp.appendTo($randomTweet);
 
-        $randomTweet.appendTo($sidebarContainer);
+        $randomTweet.appendTo($randomTweetContainer);
+        $randomTweetContainer.appendTo($sidebarContainer);
 
         $sidebarContainer.appendTo($body);
         loadTweets('home');
       });
 
       // helper function to determine timestamp
+
       function timeFrom(time) {
         var timeDifference = Date.now() - time;
         var singularPlural;
