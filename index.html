@@ -22,6 +22,7 @@
   </head>
   <body>
     <script>
+      var visitor;
       $(document).ready(function() {
         var page = 'home';
         var $body = $('body');
@@ -132,7 +133,6 @@
             $('.tweetFeedContainer').remove();
             generateRandomTweet();
             loadTweets('home');
-            console.log(page);
           });
 
           $updateButton.appendTo($buttonContainer);
@@ -144,6 +144,7 @@
         var $sidebarContainer = $('<div></div>');
         $sidebarContainer.css({
           display: 'flex',
+          flexDirection: 'column',
           width: '30%',
           background: 'rgba(255, 255, 255, .5',
           '-webkit-box-shadow': '14px 15px 23px -1px rgba(0,0,0,0.49)',
@@ -205,6 +206,61 @@
 
         $sidebarContainer.appendTo($body);
         loadTweets('home');
+
+        // post tweet
+        $postTweetContainer = $('<div></div>');
+        $postTweetContainer.css({ marginTop: '20px' });
+        $postTweetForm = $('<form></form>');
+        // handle tweet submit
+        $postTweetForm.submit(function(e) {
+          e.preventDefault();
+          var user = this.user.value;
+          var message = this.message.value;
+          if (!streams.users[user]) {
+            streams.users[user] = [];
+          }
+          visitor = user;
+
+          writeTweet(message);
+          $('.tweetFeedContainer').remove();
+          loadTweets('home');
+        });
+        $postTweetForm.css({
+          display: 'flex',
+          flexDirection: 'column',
+          width: '75%'
+        });
+        $postTweetForm.appendTo($postTweetContainer);
+
+        // get user name
+        $postTweetUsername = $(
+          '<input name="user" type="text" placeholder="Enter your name to send a message!"></input>'
+        );
+        $postTweetUsername.css({
+          marginBottom: '15px',
+          height: '50px',
+          fontSize: '1.2em',
+          borderRadius: '10px'
+        });
+        $postTweetUsername.appendTo($postTweetForm);
+
+        // get user message
+        $postTweetMessage = $(
+          '<textarea name="message" placeholder="What\'s on your mind?"></textarea>'
+        );
+        $postTweetMessage.css({
+          marginBottom: '15px',
+          height: '75px',
+          fontSize: '1.5em',
+          borderRadius: '10px'
+        });
+        $postTweetMessage.appendTo($postTweetForm);
+
+        // submit message
+        $submitPost = $('<input type="submit"></input>');
+        $submitPost.appendTo($postTweetForm);
+
+        $postTweetContainer.appendTo($sidebarContainer);
       });
 
       // helper function to determine timestamp
@@ -238,6 +294,8 @@
           return Math.floor(timeDifference / 86400000) + singularPlural;
         }
       }
+
+      // function for handling new post submission
     </script>
   </body>
 </html>
