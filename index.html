@@ -64,7 +64,7 @@
             $username.text(tweet.user);
             $username.css({ color: '#fff' });
             $username.on('click', function() {
-              $('.tweet').remove();
+              $('.tweetFeedContainer').remove();
               page = 'user page';
               loadTweets(tweet.user);
             });
@@ -104,7 +104,7 @@
             justifyContent: 'center'
           });
 
-          var $updateButton = $('<button></button>');
+          var $updateButton = $('<button class="update"></button>');
           var text = page === 'home' ? 'Update Feed' : 'Home';
           $updateButton.text(text);
           $updateButton.css({
@@ -118,11 +118,13 @@
           });
           $updateButton.on('click', function() {
             page = 'home';
-            $('.tweet').remove();
+            $('.update').remove();
+            $('.tweetFeedContainer').remove();
             generateRandomTweet();
             loadTweets('home');
             console.log(page);
           });
+
           $updateButton.appendTo($buttonContainer);
           $buttonContainer.appendTo('.tweetFeedContainer');
         }
@@ -131,7 +133,8 @@
         var $sidebarContainer = $('<div></div>');
         $sidebarContainer.css({
           display: 'flex',
-          width: '30%'
+          width: '30%',
+          background: 'rgba(255, 255, 255, .5'
         });
 
         var randomTweet = randomElement(streams.home);
@@ -157,7 +160,7 @@
 
       // helper function to determine timestamp
       function timeFrom(time) {
-        var timeDifference = Date.now() - time * 1;
+        var timeDifference = Date.now() - time;
         var singularPlural;
         if (timeDifference < 60000) {
           if (Math.floor(timeDifference / 1000) <= 1) {
@@ -170,19 +173,19 @@
             Math.floor(timeDifference / 60000) === 1 ? ' min ago' : ' mins ago';
           return Math.floor(timeDifference / 60000) + singularPlural;
         }
-        if (timeDifference < 1440000) {
+        if (timeDifference < 86400000) {
           singularPlural =
             Math.floor(timeDifference / 3600000) === 1
               ? ' hour ago'
               : ' hours ago';
           return Math.floor(timeDifference / 3600000) + singularPlural;
         }
-        if (timeDifference > 1440000) {
+        if (timeDifference > 86400000) {
           singularPlural =
-            Math.floor(timeDifference / 1440000) === 1
+            Math.floor(timeDifference / 86400000) === 1
               ? ' day ago'
               : ' days ago';
-          return Math.floor(timeDifference / 1440000) + singularPlural;
+          return Math.floor(timeDifference / 86400000) + singularPlural;
         }
       }
     </script>
