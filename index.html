@@ -1,27 +1,190 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <title>Twiddler</title>
     <script src="jquery.js"></script>
     <script src="data_generator.js"></script>
+    <style>
+      html {
+        -webkit-box-sizing: border-box;
+        -moz-box-sizing: border-box;
+        box-sizing: border-box;
+      }
+      *,
+      *:before,
+      *:after {
+        -webkit-box-sizing: inherit;
+        -moz-box-sizing: inherit;
+        box-sizing: inherit;
+      }
+    </style>
   </head>
   <body>
     <script>
-
-      $(document).ready(function(){
+      $(document).ready(function() {
+        var page = 'home';
         var $body = $('body');
         $body.html('');
+        $body.css({
+          display: 'flex',
 
-        var index = streams.home.length - 1;
-        while(index >= 0){
-          var tweet = streams.home[index];
-          var $tweet = $('<div></div>');
-          $tweet.text('@' + tweet.user + ': ' + tweet.message);
-          $tweet.appendTo($body);
-          index -= 1;
+          justifyContent: 'space-between',
+          background: 'rgb(222,252,252)',
+          backgroundAttachment: 'fixed',
+          background:
+            'radial-gradient(circle, rgba(222,252,252,1) 0%, rgba(160,213,219,1) 59%, rgba(29,160,250,1) 100%)'
+        });
+
+        // tweet stream/home
+        var loadTweets = function(req) {
+          var source = req === 'home' ? streams.home : streams.users[req];
+          var $tweetFeedContainer = $('<div class="tweetFeedContainer"></div>');
+          $tweetFeedContainer.css({
+            display: 'flex',
+            flexDirection: 'column',
+            width: '50%'
+          });
+
+          for (var i = source.length - 1; i > -1; i--) {
+            var tweet = source[i];
+            var $tweet = $('<div class="tweet"></div>');
+            $tweet.css({
+              border: '3px solid rgba(50, 50, 50, .3)',
+              borderRadius: '10px',
+              marginBottom: '5px',
+              padding: '0 40px',
+              background: 'rgb(104, 184, 234)',
+              fontSize: '2em',
+              width: '100%'
+            });
+            $('.tweet:odd').css({ background: '#acdce1' });
+
+            // username
+            var $username = $('<a "href=#"></a>');
+            $username.text(tweet.user);
+            $username.css({ color: '#fff' });
+            $username.on('click', function() {
+              $('.tweet').remove();
+              page = 'user page';
+              loadTweets(tweet.user);
+            });
+            $username.appendTo($tweet);
+
+            // message
+            var $message = $('<p></p>');
+            $message.text(tweet.message);
+            $message.css({ margin: 0, padding: '15px 0' });
+            $message.appendTo($tweet);
+
+            // timestamp
+            var $timestamp = $('<div></div>');
+            $timestamp.text(timeFrom(tweet.created_at));
+            $timestamp.css({
+              display: 'flex',
+              fontSize: '.5em',
+              width: '100%'
+            });
+            $timestamp.appendTo($tweet);
+
+            $tweet.appendTo($tweetFeedContainer);
+          }
+          $tweetFeedContainer.appendTo($body);
+          loadUpdateButton();
+        };
+
+        // tweetfeed refresh button/home button
+        function loadUpdateButton() {
+          var $buttonContainer = $('<div></div>');
+          $buttonContainer.css({
+            // background: 'rgba(142, 203, 224, 0.3)',
+            position: 'fixed',
+            bottom: 0,
+            width: '50%',
+            display: 'flex',
+            justifyContent: 'center'
+          });
+
+          var $updateButton = $('<button></button>');
+          var text = page === 'home' ? 'Update Feed' : 'Home';
+          $updateButton.text(text);
+          $updateButton.css({
+            padding: '20px 40px',
+            width: '40%',
+            borderStyle: 'none',
+            borderRadius: '15px',
+            background: '#3fa7f4',
+            color: '#fff',
+            fontSize: '1.25em'
+          });
+          $updateButton.on('click', function() {
+            page = 'home';
+            $('.tweet').remove();
+            generateRandomTweet();
+            loadTweets('home');
+            console.log(page);
+          });
+          $updateButton.appendTo($buttonContainer);
+          $buttonContainer.appendTo('.tweetFeedContainer');
         }
 
+        // info sidebar
+        var $sidebarContainer = $('<div></div>');
+        $sidebarContainer.css({
+          display: 'flex',
+          width: '30%'
+        });
+
+        var randomTweet = randomElement(streams.home);
+        var $randomTweet = $('<div></div>');
+
+        var $randomTweetUser = $('<p></p>');
+        $randomTweetUser.text(randomTweet.user);
+        $randomTweetUser.appendTo($randomTweet);
+
+        var $randomTweetText = $('<p></p>');
+        $randomTweetText.text(randomTweet.message);
+        $randomTweetText.appendTo($randomTweet);
+
+        var $randomTweetTimestamp = $('<p></p>');
+        $randomTweetTimestamp.text(timeFrom(randomTweet.created_at));
+        $randomTweetTimestamp.appendTo($randomTweet);
+
+        $randomTweet.appendTo($sidebarContainer);
+
+        $sidebarContainer.appendTo($body);
+        loadTweets('home');
       });
 
+      // helper function to determine timestamp
+      function timeFrom(time) {
+        var timeDifference = Date.now() - time * 1;
+        var singularPlural;
+        if (timeDifference < 60000) {
+          if (Math.floor(timeDifference / 1000) <= 1) {
+            return 'just now';
+          }
+          return Math.floor(timeDifference / 1000) + ' secs ago';
+        }
+        if (timeDifference < 3600000) {
+          singularPlural =
+            Math.floor(timeDifference / 60000) === 1 ? ' min ago' : ' mins ago';
+          return Math.floor(timeDifference / 60000) + singularPlural;
+        }
+        if (timeDifference < 1440000) {
+          singularPlural =
+            Math.floor(timeDifference / 3600000) === 1
+              ? ' hour ago'
+              : ' hours ago';
+          return Math.floor(timeDifference / 3600000) + singularPlural;
+        }
+        if (timeDifference > 1440000) {
+          singularPlural =
+            Math.floor(timeDifference / 1440000) === 1
+              ? ' day ago'
+              : ' days ago';
+          return Math.floor(timeDifference / 1440000) + singularPlural;
+        }
+      }
     </script>
   </body>
 </html>
