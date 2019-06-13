@@ -2,6 +2,7 @@
 <html>
   <head>
     <title>Twiddler</title>
+    <script src="https://kit.fontawesome.com/7c4580de60.js"></script>
     <script src="jquery.js"></script>
     <script src="data_generator.js"></script>
     <style>
@@ -25,6 +26,7 @@
       var visitor;
       $(document).ready(function() {
         var page = 'home';
+        var isAutoRefreshOn = true;
         var $body = $('body');
         var $main = $('<div></div>');
         $main.css({
@@ -45,7 +47,9 @@
 
         // header
 
-        var $header = $('<div><h1>Twiddler<h1></div>');
+        var $header = $(
+          '<div><h1>Twiddler <i class="fab fa-twitter"></i><h1></div>'
+        );
         $header.css({
           textAlign: 'center',
           fontSize: '2em',
@@ -164,6 +168,31 @@
             loadTweets('home');
           });
 
+          // toggle auto refresh off/on
+
+          var toggleOnOff = isAutoRefreshOn ? 'on' : 'off';
+          var $autoRefreshToggle = $(
+            '<button>Toggle auto <i class="fas fa-sync"></i></button>'
+          );
+          $autoRefreshToggle.css({
+            marginRight: '10px',
+            borderStyle: 'none',
+            borderRadius: '15px',
+            background: '#3fa7f4',
+            color: '#fff',
+            fontSize: '1.25em'
+          });
+          $autoRefreshToggle.on('click', function() {
+            if (!isAutoRefreshOn) {
+              isAutoRefreshOn = true;
+              autoReload(isAutoRefreshOn);
+            } else {
+              isAutoRefreshOn = false;
+              $autoRefreshToggle.css({ background: 'red' });
+            }
+          });
+
+          $autoRefreshToggle.appendTo($buttonContainer);
           $updateButton.appendTo($buttonContainer);
           $buttonContainer.appendTo('.tweetFeedContainer');
         }
@@ -309,9 +338,12 @@
         $postTweetMessage.appendTo($postTweetForm);
 
         // submit message
-        $submitPost = $('<input type="submit"></input>');
+        $submitPost = $(
+          '<button type="submit">Send <i class="far fa-paper-plane"></i></button>'
+        );
         $submitPost.css({
           background: 'rgb(63, 167, 244)',
+          fontSize: '1.2em',
           border: 'none',
           padding: '10px 0 10px 0',
           color: '#fff',
@@ -322,14 +354,18 @@
         $postTweetContainer.appendTo($sidebarContainer);
 
         // auto reload tweets
-        (function autoReload() {
+
+        function autoReload(autoRefreshOn) {
+          if (!autoRefreshOn) {
+            return;
+          }
           setTimeout(function() {
-            autoReload();
+            autoReload(isAutoRefreshOn);
           }, 10000);
-          console.log('loading');
           $('.tweetFeedContainer').remove();
           loadTweets(page);
-        })();
+        }
+        autoReload(isAutoRefreshOn);
       });
 
       // helper function to determine timestamp
