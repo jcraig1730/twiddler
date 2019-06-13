@@ -91,9 +91,10 @@
 
             // username
 
-            var $username = $('<a "href=#"></a>');
+            var $username = $('<a href="#"></a>');
             $username.text(tweet.user);
             $username.css({
+              textDecoration: 'none',
               color: '#fff',
               fontSize: '1.5em',
               borderBottom: '1px solid #fff'
@@ -101,7 +102,8 @@
             $username.on('click', function() {
               $('.tweetFeedContainer').remove();
               page = 'user page';
-              loadTweets(tweet.user);
+              var user = this.text;
+              loadTweets(user);
             });
             $username.appendTo($tweet);
 
@@ -317,8 +319,8 @@
         });
 
         $('.h1').css({ margin: 0 });
-        $submitPost.appendTo($postTweetForm);
 
+        $submitPost.appendTo($postTweetForm);
         $postTweetContainer.appendTo($sidebarContainer);
       });
 
