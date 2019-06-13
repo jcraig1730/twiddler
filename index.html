@@ -101,8 +101,8 @@
             });
             $username.on('click', function() {
               $('.tweetFeedContainer').remove();
-              page = 'user page';
               var user = this.text;
+              page = user;
               loadTweets(user);
             });
             $username.appendTo($tweet);
@@ -320,6 +320,16 @@
         $('h1').css({ marginTop: 0 });
         $submitPost.appendTo($postTweetForm);
         $postTweetContainer.appendTo($sidebarContainer);
+
+        // auto reload tweets
+        (function autoReload() {
+          setTimeout(function() {
+            autoReload();
+          }, 10000);
+          console.log('loading');
+          $('.tweetFeedContainer').remove();
+          loadTweets(page);
+        })();
       });
 
       // helper function to determine timestamp
